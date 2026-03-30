@@ -1,4 +1,11 @@
 import React, { useState, useCallback } from 'react';
+import { Card, CardContent, Typography, Box, Button, TextField, Stack, Paper, Divider } from '@mui/material';
+import StorageIcon from '@mui/icons-material/Storage';
+import SearchIcon from '@mui/icons-material/Search';
+import AddIcon from '@mui/icons-material/Add';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import InfoIcon from '@mui/icons-material/Info';
 
 interface DataverseAPIDemoProps {
     connection: ToolBoxAPI.DataverseConnection | null;
@@ -14,7 +21,12 @@ export const DataverseAPIDemo: React.FC<DataverseAPIDemoProps> = ({ connection, 
 
     const showNotification = useCallback(async (title: string, body: string, type: 'success' | 'info' | 'warning' | 'error') => {
         try {
-            await window.toolboxAPI.utils.showNotification({ title, body, type, duration: 3000 });
+            await window.toolboxAPI.utils.showNotification({
+                title,
+                body,
+                type,
+                duration: 3000,
+            });
         } catch (error) {
             console.error('Error showing notification:', error);
         }
@@ -156,14 +168,10 @@ export const DataverseAPIDemo: React.FC<DataverseAPIDemoProps> = ({ connection, 
             output += `Logical Name: ${metadata.LogicalName}\n`;
             output += `Metadata ID: ${metadata.MetadataId}\n`;
             output += `Display Name: ${metadata.DisplayName?.LocalizedLabels?.[0]?.Label || 'N/A'}\n`;
-            output += `Attributes: ${metadata.Attributes?.length || 0}\n`;
 
-            if (metadata.Attributes && metadata.Attributes.length > 0) {
-                output += '\nSample Attributes:\n';
-                metadata.Attributes.slice(0, 5).forEach((attr: any) => {
-                    output += `  - ${attr.LogicalName} (${attr.AttributeType})\n`;
-                });
-            }
+            const attributes = await window.dataverseAPI.getEntityRelatedMetadata('account', 'Attributes');
+            output += `Number of Attributes: ${attributes.value.length}\n`;
+            output += attributes.value.map((attr: any, index: number) => `${index + 1}.  - ${attr.LogicalName} (${attr.AttributeType})`).join('\n');
 
             setMetadataOutput(output);
             onLog('Account metadata retrieved', 'success');
@@ -175,44 +183,90 @@ export const DataverseAPIDemo: React.FC<DataverseAPIDemoProps> = ({ connection, 
     }, [connection, onLog, showNotification]);
 
     return (
-        <div className="card">
-            <h2>💾 Dataverse API Examples</h2>
+        <Card
+            sx={{
+                height: '100%',
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+            }}
+        >
+            <CardContent sx={{ flex: 1 }}>
+                <Box display="flex" alignItems="center" gap={1} mb={3}>
+                    <StorageIcon />
+                    <Typography variant="h6">Dataverse API Examples</Typography>
+                </Box>
 
-            <div className="example-group">
-                <h3>Query Records</h3>
-                <button onClick={queryAccounts} className="btn btn-primary">
-                    Query Top 10 Accounts
-                </button>
-                <div className="output">{queryOutput}</div>
-            </div>
+                <Box mb={3}>
+                    <Typography variant="subtitle1" gutterBottom fontWeight="bold">
+                        Query Records
+                    </Typography>
+                    <Button variant="contained" startIcon={<SearchIcon />} onClick={queryAccounts} sx={{ mb: 2 }}>
+                        Query Top 10 Accounts
+                    </Button>
+                    {queryOutput && (
+                        <Paper variant="outlined" sx={{ p: 2, bgcolor: 'background.default' }}>
+                            <Typography variant="body2" component="pre" sx={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap', m: 0 }}>
+                                {queryOutput}
+                            </Typography>
+                        </Paper>
+                    )}
+                </Box>
 
-            <div className="example-group">
-                <h3>CRUD Operations</h3>
-                <div className="input-group">
-                    <label htmlFor="account-name">Account Name:</label>
-                    <input type="text" id="account-name" value={accountName} onChange={(e) => setAccountName(e.target.value)} placeholder="Enter account name" />
-                </div>
-                <div className="button-group">
-                    <button onClick={createAccount} className="btn btn-primary">
-                        Create Account
-                    </button>
-                    <button onClick={updateAccount} className="btn" disabled={!createdAccountId}>
-                        Update Account
-                    </button>
-                    <button onClick={deleteAccount} className="btn btn-error" disabled={!createdAccountId}>
-                        Delete Account
-                    </button>
-                </div>
-                <div className="output">{crudOutput}</div>
-            </div>
+                <Divider sx={{ my: 2 }} />
 
-            <div className="example-group">
-                <h3>Metadata</h3>
-                <button onClick={getAccountMetadata} className="btn">
-                    Get Account Metadata
-                </button>
-                <div className="output">{metadataOutput}</div>
-            </div>
-        </div>
+                <Box mb={3}>
+                    <Typography variant="subtitle1" gutterBottom fontWeight="bold">
+                        CRUD Operations
+                    </Typography>
+                    <Box mb={2}>
+                        <TextField
+                            label="Account Name"
+                            value={accountName}
+                            onChange={(e) => setAccountName(e.target.value)}
+                            placeholder="Enter account name"
+                            fullWidth
+                            size="small"
+                        />
+                    </Box>
+                    <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap mb={2}>
+                        <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={createAccount}>
+                            Create Account
+                        </Button>
+                        <Button variant="contained" color="info" startIcon={<EditIcon />} onClick={updateAccount} disabled={!createdAccountId}>
+                            Update Account
+                        </Button>
+                        <Button variant="contained" color="error" startIcon={<DeleteIcon />} onClick={deleteAccount} disabled={!createdAccountId}>
+                            Delete Account
+                        </Button>
+                    </Stack>
+                    {crudOutput && (
+                        <Paper variant="outlined" sx={{ p: 2, bgcolor: 'background.default' }}>
+                            <Typography variant="body2" component="pre" sx={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap', m: 0 }}>
+                                {crudOutput}
+                            </Typography>
+                        </Paper>
+                    )}
+                </Box>
+
+                <Divider sx={{ my: 2 }} />
+
+                <Box>
+                    <Typography variant="subtitle1" gutterBottom fontWeight="bold">
+                        Metadata
+                    </Typography>
+                    <Button variant="outlined" startIcon={<InfoIcon />} onClick={getAccountMetadata} sx={{ mb: 2 }}>
+                        Get Account Metadata
+                    </Button>
+                    {metadataOutput && (
+                        <Paper variant="outlined" sx={{ p: 2, bgcolor: 'background.default' }}>
+                            <Typography variant="body2" component="pre" sx={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap', m: 0 }}>
+                                {metadataOutput}
+                            </Typography>
+                        </Paper>
+                    )}
+                </Box>
+            </CardContent>
+        </Card>
     );
 };
