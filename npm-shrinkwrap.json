@@ -1,12 +1,12 @@
 {
-  "name": "mb-datavalidation",
-  "version": "0.1.0",
+  "name": "@mattybeard/datavalidation",
+  "version": "0.1.2",
   "lockfileVersion": 3,
   "requires": true,
   "packages": {
     "": {
-      "name": "mb-datavalidation",
-      "version": "0.1.0",
+      "name": "@mattybeard/datavalidation",
+      "version": "0.1.2",
       "license": "MIT",
       "dependencies": {
         "@emotion/react": "^11.14.0",
