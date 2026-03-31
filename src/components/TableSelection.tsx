@@ -56,7 +56,7 @@ export const TableSelection = observer(
     const [testDialogMode, setTestDialogMode] = useState<TestDialogMode>("single");
     const [activeColumnLogicalName, setActiveColumnLogicalName] = useState<string | null>(null);
     const [selectedColumnLogicalNames, setSelectedColumnLogicalNames] = useState<string[]>([]);
-    const [sortColumnKey, setSortColumnKey] = useState<SortableColumnKey>("logicalName");
+    const [sortColumnKey, setSortColumnKey] = useState<SortableColumnKey>("displayName");
     const [isSortDescending, setIsSortDescending] = useState(false);
     const [isMatchesRegexEnabled, setIsMatchesRegexEnabled] = useState(false);
     const [isMatchesMetadataEnabled, setIsMatchesMetadataEnabled] = useState(false);
@@ -173,17 +173,6 @@ export const TableSelection = observer(
     const detailsListColumns = useMemo((): IColumn[] => {
       return [
         {
-          key: "logicalName",
-          name: "Logical Name",
-          fieldName: "logicalName",
-          minWidth: 170,
-          maxWidth: 240,
-          isResizable: true,
-          isSorted: sortColumnKey === "logicalName",
-          isSortedDescending: isSortDescending,
-          onColumnClick: handleColumnHeaderClick,
-        },
-        {
           key: "displayName",
           name: "Display Name",
           fieldName: "displayName",
@@ -191,6 +180,17 @@ export const TableSelection = observer(
           maxWidth: 320,
           isResizable: true,
           isSorted: sortColumnKey === "displayName",
+          isSortedDescending: isSortDescending,
+          onColumnClick: handleColumnHeaderClick,
+        },
+        {
+          key: "logicalName",
+          name: "Logical Name",
+          fieldName: "logicalName",
+          minWidth: 170,
+          maxWidth: 240,
+          isResizable: true,
+          isSorted: sortColumnKey === "logicalName",
           isSortedDescending: isSortDescending,
           onColumnClick: handleColumnHeaderClick,
         },
@@ -318,33 +318,73 @@ export const TableSelection = observer(
       setAttributesLoading(true);
       setAttributesError(null);
 
-      window.dataverseAPI
-        .getEntityRelatedMetadata(selectedTable, "Attributes")
-        .then((result: any) => {
-          const excludedFieldTypes = new Set(["VirtualType", "UniqueIdentifierType", "UniqueidentifierType"]);
-          const metadataMap: Record<string, any> = {};
+      const load = async () => {
+        // Pass 1: base attributes only — safe on the generic Attributes endpoint
+        const result = await window.dataverseAPI.getEntityRelatedMetadata(selectedTable, "Attributes", [
+          "LogicalName",
+          "DisplayName",
+          "AttributeTypeName",
+          "AttributeType",
+          "IsValidForRead",
+        ]);
 
-          const rows: AttributeRow[] = (result?.value ?? [])
-            .map((attribute: any) => {
-              const displayName = getDisplayLabel(attribute.DisplayName);
-              const fieldType = getFieldType(attribute);
+        const excludedFieldTypes = new Set(["VirtualType", "UniqueIdentifierType", "UniqueidentifierType"]);
+        const metadataMap: Record<string, any> = {};
 
-              metadataMap[attribute.LogicalName] = attribute;
+        const rows: AttributeRow[] = ((result as any)?.value ?? [])
+          .filter((attribute: any) => attribute.IsValidForRead === true)
+          .map((attribute: any) => {
+            const displayName = getDisplayLabel(attribute.DisplayName);
+            const fieldType = getFieldType(attribute);
 
-              return {
-                key: attribute.LogicalName,
-                logicalName: attribute.LogicalName,
-                displayName,
-                fieldType,
-                testCount: 0,
-              };
-            })
-            .filter((row: AttributeRow) => row.displayName !== "N/A")
-            .filter((row: AttributeRow) => !excludedFieldTypes.has(row.fieldType));
+            metadataMap[attribute.LogicalName] = { ...attribute };
 
-          setAttributeRows(rows);
-          setAttributeMetadataByLogicalName(metadataMap);
-        })
+            return {
+              key: attribute.LogicalName,
+              logicalName: attribute.LogicalName,
+              displayName,
+              fieldType,
+              testCount: 0,
+            };
+          })
+          .filter((row: AttributeRow) => row.displayName !== "N/A")
+          .filter((row: AttributeRow) => !excludedFieldTypes.has(row.fieldType));
+
+        setAttributeRows(rows);
+        setAttributeMetadataByLogicalName({ ...metadataMap });
+
+        // Pass 2: type-specific endpoints for extended metadata — run in parallel
+        const typeSpecificFetches: { path: string; props: string[] }[] = [
+          { path: "Attributes/Microsoft.Dynamics.CRM.StringAttributeMetadata",           props: ["LogicalName", "MaxLength"] },
+          { path: "Attributes/Microsoft.Dynamics.CRM.IntegerAttributeMetadata",          props: ["LogicalName", "MinValue", "MaxValue"] },
+          { path: "Attributes/Microsoft.Dynamics.CRM.DecimalAttributeMetadata",          props: ["LogicalName", "MinValue", "MaxValue"] },
+          { path: "Attributes/Microsoft.Dynamics.CRM.MoneyAttributeMetadata",            props: ["LogicalName", "MinValue", "MaxValue"] },
+          { path: "Attributes/Microsoft.Dynamics.CRM.PicklistAttributeMetadata",         props: ["LogicalName", "OptionSet", "GlobalOptionSet"] },
+          { path: "Attributes/Microsoft.Dynamics.CRM.MultiSelectPicklistAttributeMetadata", props: ["LogicalName", "OptionSet", "GlobalOptionSet"] },
+          { path: "Attributes/Microsoft.Dynamics.CRM.StateAttributeMetadata",            props: ["LogicalName", "OptionSet"] },
+          { path: "Attributes/Microsoft.Dynamics.CRM.StatusAttributeMetadata",           props: ["LogicalName", "OptionSet"] },
+        ];
+
+        const typeResults = await Promise.allSettled(
+          typeSpecificFetches.map(({ path, props }) =>
+            window.dataverseAPI.getEntityRelatedMetadata(selectedTable, path as any, props)
+          )
+        );
+
+        typeResults.forEach((typeResult) => {
+          if (typeResult.status !== "fulfilled") return;
+          const items: any[] = (typeResult.value as any)?.value ?? [];
+          items.forEach((item: any) => {
+            if (metadataMap[item.LogicalName]) {
+              Object.assign(metadataMap[item.LogicalName], item);
+            }
+          });
+        });
+
+        setAttributeMetadataByLogicalName({ ...metadataMap });
+      };
+
+      load()
         .catch((error: Error) => {
           setAttributesError(error.message);
           setAttributeRows([]);

@@ -148,7 +148,7 @@ export const TestResultsPanel = ({
       isSorted: sortKey === "passed",
       isSortedDescending: isSortDescending,
       onColumnClick: handleColumnClick,
-      onRender: (item: ColumnTestResult) => item.passCount.toLocaleString(),
+      onRender: (item: ColumnTestResult) => String(item.passCount),
     },
     {
       key: "failed",
@@ -158,7 +158,7 @@ export const TestResultsPanel = ({
       isSorted: sortKey === "failed",
       isSortedDescending: isSortDescending,
       onColumnClick: handleColumnClick,
-      onRender: (item: ColumnTestResult) => item.failCount.toLocaleString(),
+      onRender: (item: ColumnTestResult) => String(item.failCount),
     },
     {
       key: "rate",
@@ -177,8 +177,8 @@ export const TestResultsPanel = ({
     <Stack tokens={{ childrenGap: 8 }}>
       <MessageBar messageBarType={barType}>
         <strong>
-          {results.totalRecords.toLocaleString()} records checked - {overallRate}% pass rate ({totalPassed.toLocaleString()}/
-          {totalChecks.toLocaleString()} checks)
+          {results.totalRecords} records checked - {overallRate}% pass rate ({totalPassed}/
+          {totalChecks} checks)
         </strong>
       </MessageBar>
       <DetailsList
