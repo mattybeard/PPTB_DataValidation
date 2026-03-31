@@ -1,10 +1,9 @@
 import { useCallback } from "react";
-import { ConnectionStatus } from "./components/ConnectionStatus";
 import { useConnection, useToolboxEvents } from "./hooks/useToolboxAPI";
 import { TableSelection } from "./components/TableSelection";
 
 function App() {
-    const { connection, isLoading, refreshConnection } = useConnection();
+    const { connection, refreshConnection } = useConnection();
 
     // Handle platform events
     const handleEvent = useCallback(
@@ -34,8 +33,6 @@ function App() {
                 <h1>Data Validation Tool</h1>
                 <p className="subtitle">Select a Dataverse table, define column tests, and run selected checks.</p>
             </header>
-
-            <ConnectionStatus connection={connection} isLoading={isLoading} />
 
             <TableSelection connection={connection} />
         </>

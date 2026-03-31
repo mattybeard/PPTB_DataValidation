@@ -1,11 +1,22 @@
 {
-  "name": "mb-datavalidation",
+  "name": "@mbeard/datavalidation",
   "version": "0.1.0",
-  "displayName": "DataValidation",
-  "description": "Power Platform Tool to check the validity of data",
+  "displayName": "Data Validation",
+  "description": "A Power Platform Toolbox tool for validating Dataverse table data against configurable column-level rules. Run tests across thousands of records and instantly see pass/fail results with detailed breakdowns.",
   "main": "index.html",
   "author": "Power Platform ToolBox",
   "license": "MIT",
+  "icon": "tool-icon.svg",
+  "contributors": [
+    {
+      "name": "Matt Beard",
+      "email": "matt@mbeard.co.uk"
+    }
+  ],
+    "configurations": {
+      "repository": "https://github.com/mattybeard/PPTB_DataValidation",
+      "readmeUrl": "https://raw.githubusercontent.com/mattybeard/PPTB_DataValidation/refs/heads/main/README.md"
+  },
   "engines": {
     "node": ">=18.0.0"
   },
@@ -13,7 +24,8 @@
     "build": "tsc && vite build",
     "dev": "vite",
     "preview": "vite preview",
-    "finalize-package": "npm shrinkwrap"
+    "finalize-package": "npm shrinkwrap",
+    "validate": "pptb-validate"
   },
   "dependencies": {
     "@fluentui/react": "^8.119.1",

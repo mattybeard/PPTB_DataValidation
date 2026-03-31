@@ -1,95 +1,101 @@
 # DataValidation
 
-Power Platform Tool to check the validity of data
+DataValidation is a Power Platform ToolBox tool for running simple, repeatable data quality checks against Dataverse tables.
 
-## Features
+The tool lets you select a table, choose columns, configure tests per column, and run those tests across all records to produce a headline pass rate and per-test results.
 
-- ✅ React 18 with TypeScript
-- ✅ Vite for fast development and building
-- ✅ Access to ToolBox API via `window.toolboxAPI`
-- ✅ Connection URL and access token handling
-- ✅ Event subscription and handling
-- ✅ Hot Module Replacement (HMR) for development
+## Current Capabilities
 
-## Structure
+### Table and Column Setup
 
-```
-mb-datavalidation/
-├── src/
-│   ├── App.tsx         # Main component
-│   ├── main.tsx        # Entry point
-│   └── styles.css      # Styling
-├── dist/               # Build output
-├── index.html
-├── package.json
-├── tsconfig.json
-└── vite.config.ts
-```
+- Browse Dataverse tables (display name + logical name).
+- Load table columns and filter out unsupported/internal types.
+- Sort columns by logical name, display name, type, or configured test count.
+- Configure tests per column or apply tests in bulk to selected columns.
 
-## Installation
+### Implemented Tests
 
-Install dependencies:
+- `Contains Data`
+  - Passes when the value is not null, undefined, or empty/whitespace.
+
+- `Matches Regex`
+  - Uses a configured regular expression against the string form of the value.
+
+- `Matches Metadata` (currently implemented for selected attribute types)
+  - `StringType`: value length must be `<= MaxLength`.
+  - `IntegerType`: value must be an integer within `[MinValue, MaxValue]` (where bounds exist).
+  - `DecimalType` and `MoneyType`: numeric value must be within `[MinValue, MaxValue]` (where bounds exist).
+  - `PicklistType`, `StateType`, `StatusType`: value must exist in metadata options.
+
+## How Test Execution Works
+
+When you click `Run Selected Tests`, the tool:
+
+1. Builds a FetchXML query including only columns with configured tests.
+2. Retrieves all records for the selected table (paged).
+3. Executes configured tests against each record value.
+4. Displays:
+   - A headline pass rate across all executed checks.
+   - A per-column, per-test pass/fail breakdown.
+
+## Local Development
+
+### Prerequisites
+
+- Node.js 18+
+
+### Install
 
 ```bash
 npm install
 ```
 
-## Development
+or
 
-Start development server with HMR:
+```bash
+pnpm install
+```
+
+### Run Dev Mode
 
 ```bash
 npm run dev
 ```
 
-Build the tool:
+### Build
 
 ```bash
 npm run build
 ```
 
-Preview production build:
+### Validate Package
 
 ```bash
-npm run preview
+npm run validate
 ```
 
-## Usage in ToolBox
+## Usage in Power Platform ToolBox
 
-1. Build the tool using `npm run build`
-2. Install the tool in ToolBox
-3. Load and use the tool from the ToolBox interface
+1. Build the tool (`npm run build`).
+2. Package/install in ToolBox using your normal ToolBox workflow.
+3. Connect to a Dataverse environment.
+4. Select a table.
+5. Configure tests on one or more columns.
+6. Run tests and review the summary/results grid.
 
-## API Usage
+## Notes and Limitations
 
-The tool demonstrates various ToolBox API features:
+- `Matches Metadata` is intentionally incremental and currently covers the types listed above.
+- Empty values are treated as metadata-valid so that completeness checks remain the job of `Contains Data`.
+- Very large tables may take longer due to full-table paging and in-memory evaluation.
 
-### Getting Connection Context
+## Tech Stack
 
-```typescript
-const context = await window.toolboxAPI.getToolContext();
-console.log(context.connectionUrl);
-console.log(context.accessToken);
-```
-
-### Showing Notifications
-
-```typescript
-await window.toolboxAPI.showNotification({
-  title: 'Success',
-  body: 'Operation completed',
-  type: 'success'
-});
-```
-
-### Subscribing to Events
-
-```typescript
-window.toolboxAPI.onToolboxEvent((event, payload) => {
-  console.log('Event:', payload.event);
-  console.log('Data:', payload.data);
-});
-```
+- React 18 + TypeScript
+- MobX
+- Fluent UI React v8
+- Vite
+- `window.dataverseAPI` and `window.toolboxAPI` from Power Platform ToolBox
 
 ## License
 

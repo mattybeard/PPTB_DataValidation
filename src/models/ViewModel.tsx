@@ -125,4 +125,8 @@ export class ViewModel {
     getTestsForColumn(tableLogicalName: string, columnLogicalName: string): ColumnTestDefinition[] {
         return this.testsByTableAndColumn[tableLogicalName]?.[columnLogicalName] ?? [];
     }
+
+    clearAllTestsForTable(tableLogicalName: string): void {
+        delete this.testsByTableAndColumn[tableLogicalName];
+    }
 }
