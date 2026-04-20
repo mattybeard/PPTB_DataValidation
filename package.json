@@ -1,6 +1,6 @@
 {
   "name": "@mattybeard/datavalidation",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "displayName": "Data Validation",
   "description": "A Power Platform Toolbox tool for validating Dataverse table data against configurable column-level rules. Run tests across thousands of records and instantly see pass/fail results with detailed breakdowns.",
   "main": "index.html",
