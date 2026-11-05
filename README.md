@@ -38,6 +38,16 @@ When you click `Run Selected Tests`, the tool:
    - A headline pass rate across all executed checks.
    - A per-column, per-test pass/fail breakdown.
 
+## Version History
+### 1.0.0
+Public Finalised Launch. A few minor bugfixes to bring up to date with PPTB.
+
+### 0.1.4
+Initial Beta Release of Tool
+
+## Screenshot
+![Screenshot of tool](img/1.png)
+
 ## Local Development
 
 ### Prerequisites

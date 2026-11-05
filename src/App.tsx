@@ -1,15 +1,15 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { createTheme, ThemeProvider, Toggle } from "@fluentui/react";
-import { useConnection, useToolboxEvents } from "./hooks/useToolboxAPI";
+import { useCallback, useEffect, useMemo } from "react";
+import { createTheme, ThemeProvider } from "@fluentui/react";
+import { useConnection, useCurrentTheme, useToolboxEvents } from "./hooks/useToolboxAPI";
 import { TableSelection } from "./components/TableSelection";
 
 function App() {
-    const [isDarkMode, setIsDarkMode] = useState(true);
+    const currentTheme = useCurrentTheme();
     const { connection, refreshConnection } = useConnection();
 
     const theme = useMemo(
         () => createTheme({
-            palette: isDarkMode
+            palette: currentTheme === 'dark'
                 ? {
                       themePrimary: "#4aa3ff",
                       themeLighterAlt: "#03080d",
@@ -59,12 +59,12 @@ function App() {
                       white: "#ffffff",
                   },
         }),
-        [isDarkMode]
+        [currentTheme]
     );
 
     useEffect(() => {
-        document.body.setAttribute("data-theme", isDarkMode ? "dark" : "light");
-    }, [isDarkMode]);
+        document.body.setAttribute("data-theme", currentTheme === 'dark' ? "dark" : "light");
+    }, [currentTheme]);
 
     // Handle platform events
     const handleEvent = useCallback(
@@ -93,14 +93,6 @@ function App() {
             <header className="header">
                 <div className="headerTopRow">
                     <h1>Data Validation Tool</h1>
-                    <Toggle
-                        checked={isDarkMode}
-                        onChange={(_, checked) => setIsDarkMode(Boolean(checked))}
-                        onText="Dark"
-                        offText="Light"
-                        label="Theme"
-                        inlineLabel
-                    />
                 </div>
                 <p className="subtitle">Select a Dataverse table, define column tests, and run selected checks.</p>
             </header>
