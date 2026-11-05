@@ -7,7 +7,7 @@ export type LogEntry = {
 };
 
 export function useConnection() {
-    const [connection, setConnection] = useState<ToolBoxAPI.DataverseConnection | null>(null);
+    const [connection, setConnection] = useState<ToolBoxAPI.Connection | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     const refreshConnection = useCallback(async () => {
@@ -65,4 +65,18 @@ export function useEventLog() {
     }, []); // Empty deps is safe because we use functional setState
 
     return { logs, addLog, clearLogs };
+}
+
+export function useCurrentTheme() {
+    const [currentTheme, setCurrentTheme] = useState<'light' | 'dark'>('light');
+
+    useEffect(() => {
+        const fetchTheme = async () => {
+            const theme = await window.toolboxAPI.utils.getCurrentTheme();
+            setCurrentTheme(theme === 'dark' ? 'dark' : 'light');
+        };
+        fetchTheme();
+    }, []);
+
+    return currentTheme;
 }

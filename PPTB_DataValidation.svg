@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">PPTB Data Validation</title>
+  <desc id="desc">Database, data grid and validation checkmark.</desc>
+  <defs>
+    <linearGradient id="database" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#00D5EE"/>
+      <stop offset="1" stop-color="#00CDA7"/>
+    </linearGradient>
+    <linearGradient id="check" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#19D7A7"/>
+      <stop offset="1" stop-color="#00CFA8"/>
+    </linearGradient>
+    <linearGradient id="header" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6B3AFF"/>
+      <stop offset="1" stop-color="#4935E9"/>
+    </linearGradient>
+  </defs>
+  <rect x="44" y="44" width="936" height="936" rx="188" fill="#03134A"/>
+  <!-- Stacked database -->
+  <ellipse cx="352" cy="235" rx="225" ry="80" fill="url(#database)"/>
+  <path d="M127 273c34 48 117 73 225 73s191-25 225-73v100c-31 48-118 76-225 76s-194-28-225-76z" fill="url(#database)"/>
+  <path d="M127 420c34 48 117 73 225 73 10 0 20 0 30-1v119c-10 1-20 1-30 1-107 0-194-28-225-76z" fill="url(#database)"/>
+  <path d="M127 568c34 48 117 73 225 73 10 0 20 0 30-1v124c-112-7-213-40-255-82z" fill="url(#database)"/>
+  <!-- Spreadsheet panel -->
+  <rect x="329" y="386" width="565" height="458" rx="59" fill="#FFFFFF" stroke="#03134A" stroke-width="20"/>
+  <rect x="370" y="429" width="145" height="80" rx="13" fill="url(#header)"/>
+  <rect x="533" y="429" width="145" height="80" fill="url(#header)"/>
+  <rect x="696" y="429" width="156" height="80" rx="13" fill="url(#header)"/>
+  <g fill="#092459">
+    <rect x="370" y="529" width="145" height="64"/>
+    <rect x="533" y="529" width="145" height="64"/>
+    <rect x="696" y="529" width="156" height="64"/>
+    <rect x="370" y="613" width="145" height="64"/>
+    <rect x="533" y="613" width="145" height="64"/>
+    <rect x="696" y="613" width="156" height="64"/>
+    <rect x="370" y="697" width="145" height="102" rx="10"/>
+    <rect x="533" y="697" width="145" height="102"/>
+  </g>
+  <!-- Validation badge -->
+  <circle cx="735" cy="751" r="179" fill="#03134A"/>
+  <circle cx="735" cy="751" r="153" fill="url(#check)"/>
+  <path d="m660 752 57 57 111-120" fill="none" stroke="#FFFFFF" stroke-width="49" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

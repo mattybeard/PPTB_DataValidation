@@ -1,6 +1,6 @@
 {
   "name": "@mattybeard/datavalidation",
-  "version": "0.1.4",
+  "version": "1.0.0",
   "displayName": "Data Validation",
   "description": "A Power Platform Toolbox tool for validating Dataverse table data against configurable column-level rules. Run tests across thousands of records and instantly see pass/fail results with detailed breakdowns.",
   "main": "index.html",
@@ -15,10 +15,11 @@
   ],
     "configurations": {
       "repository": "https://github.com/mattybeard/PPTB_DataValidation",
-      "readmeUrl": "https://raw.githubusercontent.com/mattybeard/PPTB_DataValidation/refs/heads/main/README.md"
+      "readmeUrl": "https://raw.githubusercontent.com/mattybeard/PPTB_DataValidation/refs/heads/main/README.md",
+      "website": "https://www.mbeard.co.uk"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.12.0"
   },
   "scripts": {
     "build": "tsc && vite build",
@@ -44,7 +45,7 @@
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
     "typescript": "^5.6.3",
-    "vite": "^7.1.11"
+    "vite": "^7.3.1"
   },
   "files": [
     "dist",
